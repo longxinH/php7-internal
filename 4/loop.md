@@ -45,6 +45,8 @@ void zend_compile_while(zend_ast *ast)
     
     //(1)编译ZEND_JMP
     opnum_jmp = zend_emit_jump(0);
+
+    zend_begin_loop(ZEND_NOP, NULL);
     
     //(2)编译循环体statement，opnum_start为循环体起始位置
     opnum_start = get_next_op_number(CG(active_op_array));
@@ -59,6 +61,8 @@ void zend_compile_while(zend_ast *ast)
     
     //(4)编译ZEND_JMPNZ，用于循环条件成立时跳回循环体开始位置：opnum_start
     zend_emit_cond_jump(ZEND_JMPNZ, &cond_node, opnum_start);
+
+    zend_end_loop(opnum_cond);
 }
 ```
 编译后opcode整体如下：
@@ -256,5 +260,13 @@ foreach($arr as $k=>$v){
 * __(4)__ 执行循环体的statement；
 * __(5)__ 执行`ZEND_JMPNZ`跳回步骤(2)；
 * __(6)__ 遍历结束后执行`ZEND_FE_FREE`释放数组。
+
+PHP中还有几个与遍历相关的函数：
+
+* current() - 返回数组中的当前单元
+* each() - 返回数组中当前的键／值对并将数组指针向前移动一步
+* end() - 将数组的内部指针指向最后一个单元
+* next() - 将数组中的内部指针向前移动一位
+* prev() - 将数组的内部指针倒回一位
 
 
