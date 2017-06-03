@@ -85,19 +85,51 @@ function my_function(){
     return $ret;
 }
 ```
-另外参数还有其它的信息，比如默认值、引用传递，这些信息通过`zend_arg_info`结构记录：
+另外参数还有其它的信息，这些信息通过`zend_arg_info`结构记录：
 ```c
 typedef struct _zend_arg_info {
-    zend_string *name; //函数名
+    zend_string *name; //参数名
     zend_string *class_name;
     zend_uchar type_hint; //显式声明的参数类型，比如(array $param_1)
     zend_uchar pass_by_reference; //是否引用传参，参数前加&的这个值就是1
-    zend_bool allow_null; //是否允许为空
-    zend_bool is_variadic; //是否为可变参数，即...用法，与golang的用法相同，5.6以上新增的一个用法
+    zend_bool allow_null; //是否允许为NULL,注意：这个值并不是用来表示参数是否为必传的
+    zend_bool is_variadic; //是否为可变参数，即...用法，与golang的用法相同，5.6以上新增的一个用法：function my_func($a, ...$b){...}
 } zend_arg_info;
 ```
-每个参数都有一个上面的结构，所有参数的结构保存在`zend_op_array.arg_info`数组中。
+每个参数都有一个上面的结构，所有参数的结构保存在`zend_op_array.arg_info`数组中，这里有一个地方需要注意：`zend_op_array->arg_info`数组保存的并不全是输入参数，如果函数声明了返回值类型则也会为它创建一个`zend_arg_info`，这个结构在arg_info数组的第一个位置，这种情况下`zend_op_array->arg_info`指向的实际是数组的第二个位置，返回值的结构通过`zend_op_array->arg_info[-1]`读取，这里先单独看下编译时的处理：
+```c
+//函数参数的编译
+void zend_compile_params(zend_ast *ast, zend_ast *return_type_ast)
+{
+    zend_ast_list *list = zend_ast_get_list(ast);
+    uint32_t i;
+    zend_op_array *op_array = CG(active_op_array);
+    zend_arg_info *arg_infos;
 
+    if (return_type_ast) {
+        //声明了返回值类型：function my_func():array{...}
+        //多分配一个zend_arg_info
+        arg_infos = safe_emalloc(sizeof(zend_arg_info), list->children + 1, 0);
+        ...
+        arg_infos->allow_null = 0;
+        ...
+        //arg_infos指向了下一个位置
+        arg_infos++;
+        op_array->fn_flags |= ZEND_ACC_HAS_RETURN_TYPE;
+    } else {
+        //没有声明返回值类型
+        if (list->children == 0) {
+            return;
+        }
+        arg_infos = safe_emalloc(sizeof(zend_arg_info), list->children, 0);
+    }
+    ...
+
+    op_array->num_args = list->children;
+    //声明了返回值的情况下arg_infos已经指向了数组的第二个元素
+    op_array->arg_info = arg_infos;
+}
+```
 #### 3.2.1.3 函数的编译
 我们在上一篇文章介绍过PHP代码的编译过程，主要是PHP->AST->Opcodes的转化，上面也说了函数其实就是将一组PHP代码编译为单独的opcodes，函数的调用就是不同opcodes间的切换，所以函数的编译过程与普通PHP代码基本一致，只是会有一些特殊操作，我们以3.2.1.2开始那个例子简单看下编译过程。
 
@@ -192,8 +224,10 @@ $c = 345; //编译到zend_op_array_1
 
 >> __操作2：__ 每个参数生成一条opcode，如果是可变参数其opcode=ZEND_RECV_VARIADIC，如果有默认值则为ZEND_RECV_INIT，否则为ZEND_RECV
 
-> 上面的例子中$a编号为96，$b为112，同时生成了两条opcode：ZEND_RECV、ZEND_RECV_INIT，调用的时候会根据具体传参数量跳过部分opcode，比如这个函数我们这么调用`my_function($a)`则ZEND_RECV这条opcode就直接跳过了，然后执行ZEND_RECV_INIT将默认值写到112位置，具体的编译过程在`zend_compile_params()`中，这里不再展开。
-
+> 上面的例子中$a编号为96，$b为112，同时生成了两条opcode：ZEND_RECV、ZEND_RECV_INIT，调用的时候会根据具体传参数量跳过部分opcode，比如这个函数我们这么调用`my_function($a)`则ZEND_RECV这条opcode就直接跳过了，然后执行ZEND_RECV_INIT将默认值写到112位置，具体的编译过程在`zend_compile_params()`中，上面已经介绍过。
+>
+> 参数默认值的保存与普通变量赋值相同：`$a = array()`，`array()`保存在literals，参数的默认值也是如此。
+>
 > __(3)__ 编译函数内部语法，这个跟普通PHP代码编译过程无异。
 
 > __(4)__ pass_two()，上一篇介绍过，不再赘述。
