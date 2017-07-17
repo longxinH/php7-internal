@@ -4,6 +4,11 @@
 
 代码版本：php-7.0.12
 ````
+## 反馈
+[交流&吐槽](https://github.com/pangudashu/php7-internal/issues/3)  [错误反馈](https://github.com/pangudashu/php7-internal/issues/2)
+
+![](img/my_wx2.png)
+
 ## 目录：
 * 第1章 PHP基本架构
    * 1.1 PHP简介
@@ -74,20 +79,32 @@
    * [7.7 zval的操作](7/var.md)
       * [7.7.1 新生成各类型zval](7/var.md)
       * [7.7.2 获取zval的值及类型](7/var.md)
-      * [7.7.3 引用计数](7/var.md)
-      * [7.7.4 字符串操作](7/var.md)
-      * [7.7.5 数组操作](7/var.md)
+      * [7.7.3 类型转换](7/var.md)
+      * [7.7.4 引用计数](7/var.md)
+      * [7.7.5 字符串操作](7/var.md)
+      * [7.7.6 数组操作](7/var.md)
    * [7.8 常量](7/constant.md)
    * 7.9 面向对象
-      * 7.6.1 扩展中创建对象
-      * 7.6.2 创建内部类
+      * 7.9.1 内部类注册
+      * 7.9.2 定义成员属性
+      * 7.9.3 定义成员方法
+      * 7.9.4 定义常量
+      * 7.9.5 类的实例化
    * 7.10 资源类型
    * 7.11 经典扩展解析
       * 7.8.1 Yaf
       * 7.8.2 Redis
-      * 7.8.3 Memcached
-
-## 反馈
-[交流&吐槽](https://github.com/pangudashu/php7-internal/issues/3)  [错误反馈](https://github.com/pangudashu/php7-internal/issues/2)
-
+* 第8章 命名空间
+   * [8.1 概述](8/namespace.md)
+   * [8.2 命名空间的定义](8/namespace.md)
+      * [8.2.1 定义语法](8/namespace.md)
+      * [8.2.2 内部实现](8/namespace.md)
+   * [8.3 命名空间的使用](8/namespace.md)
+      * [8.3.1 基本用法](8/namespace.md)
+      * [8.3.2 use导入](8/namespace.md)
+      * [8.3.3 动态用法](8/namespace.md)
+ 
+## 附录
+   * [附录1：break/continue按标签中断语法实现](try/break.md)
+   * 附录2：defer推迟函数调用语法的实现
 
