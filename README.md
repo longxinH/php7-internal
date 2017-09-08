@@ -37,6 +37,7 @@
       * <a href="3/zend_executor.md#331-数据结构">3.3.1 基本结构</a>
       * <a href="3/zend_executor.md#332-执行流程">3.3.2 执行流程</a>
       * <a href="3/zend_executor.md#333-函数的执行流程">3.3.3 函数的执行流程</a>
+      * [3.3.4 全局execute_data和opline](3/zend_global_register.md)
    * 3.4 面向对象实现
       * [3.4.1 类](3/zend_class.md)
       * [3.4.2 对象](3/zend_object.md)
@@ -45,6 +46,10 @@
       * [3.4.5 魔术方法](3/zend_magic_method.md)
       * [3.4.6 类的自动加载](3/zend_autoload.md)
    * [3.5 运行时缓存](3/zend_runtime_cache.md)
+   * 3.6 Opcache
+      * 3.6.1 opcode缓存
+      * 3.6.2 opcode优化
+      * 3.6.3 JIT
 * 第4章 PHP基础语法实现
    * [4.1 类型转换](4/type.md)
    * [4.2 选择结构](4/if.md)
