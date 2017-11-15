@@ -7,7 +7,12 @@
 ## 反馈
 [交流&吐槽](https://github.com/pangudashu/php7-internal/issues/3)  [错误反馈](https://github.com/pangudashu/php7-internal/issues/2)
 
-![](img/my_wx2.png)
+## 纸质版
+<div align="center">
+    <img src="img/book.jpg" height="280" >
+
+    (coming soon)
+</div>
 
 ## 目录：
 * 第1章 PHP基本架构
